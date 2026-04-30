@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+
 
 const Signup = () => {
   const [formData, setFormData] = useState({ username: '', email: '', password: '' });
-  const { setIsAuthenticated, setUser } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -20,7 +19,6 @@ const Signup = () => {
 
       if (res.data.success) {
         // 1. Update Context so the app knows we are logged in
-        setIsAuthenticated(true);
         setUser(res.data.user);
 
         // 2. Success Feedback
