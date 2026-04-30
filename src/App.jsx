@@ -11,8 +11,6 @@ import UpcomingFeature from './components/upcommingPage';
 
 
 function App() {
-  const { isAuthenticated, loading } = useAuth();
-  if (loading) return <div className="bg-gray-900 min-h-screen" />;
   return (
     <Router>
       <div className="app-container bg-gray-900 min-h-screen">
