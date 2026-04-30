@@ -62,11 +62,6 @@ const Home = () => {
           Premium Esports Overlays
         </motion.p>
       </div>
-      <UpcomingFeature 
-        isOpen={showModal} 
-        onClose={() => setShowModal(false)} 
-        featureName="SIGN UP" 
-      />
     </div>
   );
 };
