@@ -16,8 +16,9 @@ const Signup = () => {
     try {
       // Ensure your backend URL is correct (or use a proxy in package.json)
       const res = await axios.post('https://fxae-backend.onrender.com/auth/signup', formData);
+      //const res = await axios.post('http://localhost:5000/auth/signup', formData);
 
-      
+
       if (res.status === 200 || res.status === 201) {
         // 1. Update Context so the app knows we are logged in
 

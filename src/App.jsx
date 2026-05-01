@@ -8,6 +8,7 @@ import AdminDashboard from './pages/AdminDashboard'; // The approval list
 import Home from './pages/Home';
 import Signup from './pages/signup';
 import UpcomingFeature from './components/upcommingPage';
+import Dashboard from './pages/Dashboard'
 
 
 function App() {
