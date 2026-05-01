@@ -17,9 +17,8 @@ const Signup = () => {
       // Ensure your backend URL is correct (or use a proxy in package.json)
       const res = await axios.post('https://fxae-backend.vercel.app/auth/signup', formData);
 
-      if (res.data.success) {
+      if (res.status === 200 || res.status === 201) {
         // 1. Update Context so the app knows we are logged in
-        setUser(res.data.user);
 
         // 2. Success Feedback
         alert("Logged In Successfully! 🚀");
