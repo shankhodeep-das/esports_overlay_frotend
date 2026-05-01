@@ -45,6 +45,12 @@ const AdminDashboard = () => {
 
     return (
         <div className="min-h-screen bg-gray-900 text-white p-8">
+            <button 
+                onClick={() => navigate(-1)} 
+                className="absolute top-3 left-8 text-white  flex items-center gap-2 hover:text-green-400 transition-all"
+            >
+                ← Back to Previous page
+            </button>
             <h1 className="text-3xl font-bold mb-6">Management Requests</h1>
             <div className="bg-gray-800 rounded-lg shadow-lg overflow-hidden">
                 <h1 className='p-3 text-right'>Total Requests: {requests.length}</h1>
