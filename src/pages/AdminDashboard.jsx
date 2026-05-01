@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { fetchPendingMembers, updateMemberStatus } from '../api/adminService';
 import UserRow from '../components/Admin/UserRow';
+import { useNavigate } from 'react-router-dom';
 
 const AdminDashboard = () => {
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
 
     const loadData = async () => {
         try {
