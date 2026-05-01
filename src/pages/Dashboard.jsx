@@ -64,7 +64,7 @@ const Dashboard = () => {
               T
             </div>
             <div className="text-right hidden sm:block">
-              <p className="text-sm font-medium">{user?.username}!</p>
+              <p className="text-sm font-medium">{user?.name}!</p>
               <p className="text-xs text-green-500">{user?.role}</p>
             </div>
           </div>
