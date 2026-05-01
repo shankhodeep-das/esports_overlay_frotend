@@ -60,14 +60,15 @@ const Dashboard = () => {
           </div>
           
           <div className="flex items-center gap-4">
-            <div className="h-10 w-10 rounded-full bg-gradient-to-tr from-blue-600 to-purple-600 flex items-center justify-center font-bold border-2 border-white/10">
-              T
+            <div className="h-10 w-10 rounded-full bg-gradient-to-tr from-blue-600 to-purple-600 flex items-center justify-center font-bold border-2 border-white/10 uppercase">
+    {/* This logic gets the first letter of the name or '?' if the name isn't loaded yet */}
+                {user?.name ? user.name.charAt(0) : '?'}
             </div>
             <div className="text-right hidden sm:block">
-              <p className="text-sm font-medium">{user?.name}!</p>
-              <p className="text-xs text-green-500">{user?.role}</p>
+                <p className="text-sm font-medium">{user?.name}!</p>
+                <p className="text-xs text-green-500 uppercase">{user?.role}</p>
             </div>
-          </div>
+        </div>  
         </header>
 
         {/* Stats Section */}
