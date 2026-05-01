@@ -1,9 +1,24 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from "../context/AuthContext";
 
 const Dashboard = () => {
+    const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const handleLogout = async () => {
+        await API.post("/auth/logout");
+        setUser(null);
+        navigate("/login");
+    };
+
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate("/login"); // Redirect to login if no user is found
+    }
+  }, [user, loading, navigate]);
+
+  if (loading) return <div>Loading...</div>;
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white flex font-sans">
@@ -23,7 +38,7 @@ const Dashboard = () => {
         </nav>
 
         <button 
-          onClick={() => navigate('/')}
+          onClick={() => handleLogout()}
           className="mt-auto p-3 text-gray-500 hover:text-red-400 hover:bg-red-400/5 rounded-xl transition-all text-sm flex items-center gap-2"
         >
           <span>Logout</span>
@@ -49,8 +64,8 @@ const Dashboard = () => {
               T
             </div>
             <div className="text-right hidden sm:block">
-              <p className="text-sm font-medium">Test User</p>
-              <p className="text-xs text-green-500">Administrator</p>
+              <p className="text-sm font-medium">{user?.username}!</p>
+              <p className="text-xs text-green-500">{user?.role}</p>
             </div>
           </div>
         </header>
