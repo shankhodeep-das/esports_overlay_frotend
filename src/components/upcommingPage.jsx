@@ -83,7 +83,7 @@ const UpcomingFeature = ({ featureName = "This Section" }) => {
           className="text-gray-400 text-lg md:text-xl font-light mb-12 tracking-wide px-6"
           variants={itemVariants}
         >
-          Our development squad is fine-tuning this section to deliver a premium experience. We appreciate your patience while we deploy the final patches.
+          Our developer is fine-tuning this section to deliver a premium experience. We appreciate your patience while we deploy the final patches.
         </motion.p>
         
         {/* Action Button */}
