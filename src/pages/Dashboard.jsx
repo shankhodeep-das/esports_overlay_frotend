@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from "../context/AuthContext";
@@ -8,11 +8,16 @@ import { useComingSoon } from '../hooks/useComingSoon';
 
 
 const Dashboard = () => {
-    const { user, loading } = useAuth();
+    const { user, loading, setUser } = useAuth();
     const [stats, setStats] = useState({ totalMembers: 0, totalMatches: 0 });
     const [serverMetrics, setServerMetrics] = useState({ load: 0, region: 'Loading...' });
     const [latency, setLatency] = useState(0);
     const [announcement, setAnnouncement] = useState(null);
+    const [isSending, setIsSending] = useState(false);
+    const [showOtpModal, setShowOtpModal] = useState(false);
+    const [otpSent, setOtpSent] = useState(false);
+    const [otp, setOtp] = useState(new Array(6).fill(""));
+    const inputRefs = useRef([]);
   const navigate = useNavigate();
   const handleLogout = async () => {
         await API.post("/auth/logout");
@@ -108,6 +113,66 @@ const Dashboard = () => {
 
     fetchCurrentAnnouncement();
   }, []);
+  const handleRequestOTP = async () => {
+    setIsSending(true);
+    try {
+        const response = await API.post('/verify/request-otp', { 
+            email: user.email 
+        });
+        
+        if (response.status === 200) {
+          setOtpSent(true);
+            // Trigger a toast notification or alert
+            setTimeout(() => {
+                setShowOtpModal(true);
+            }, 500);
+        }
+    } catch (error) {
+        console.error("Failed to send OTP", error);
+        alert("Error sending OTP. Please try again.");
+    } finally {
+        setIsSending(false);
+    }
+  };
+  const handleChange = (element, index) => {
+    if (isNaN(element.value)) return false;
+
+    const newOtp = [...otp];
+    newOtp[index] = element.value;
+    setOtp(newOtp);
+
+    // Auto-focus next input
+    if (element.value !== "" && index < 5) {
+        inputRefs.current[index + 1].focus();
+    }
+  };
+
+  const handleKeyDown = (e, index) => {
+    // Move to previous input on backspace
+    if (e.key === "Backspace" && !otp[index] && index > 0) {
+        inputRefs.current[index - 1].focus();
+    }
+  };
+  const handleVerifyOTP = async (enteredOtp) => {
+    try {
+        const res = await API.post('/verify/verify-otp', { 
+            email: user.email, 
+            otp: enteredOtp 
+        });
+        if (res.status === 200) {
+            setShowOtpModal(false);
+            // You might want to refresh the user context here 
+            // so the Red Warning changes to the Green Tick.
+            setUser(prev => ({
+                ...prev,
+                isVerified: true
+            }));
+            setOtp(new Array(6).fill(""));
+        }
+    } catch (err) {
+        alert("Invalid code. Please try again.");
+    }
+  };
   useEffect(() => {
     if (!loading && !user) {
       navigate("/login"); // Redirect to login if no user is found
@@ -155,7 +220,7 @@ const Dashboard = () => {
             <p className="text-gray-400 text-sm">Monitoring active production sessions</p>
           </div>
           
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4">
             <AnimatePresence>
               {announcement && (
                 <motion.div 
@@ -183,14 +248,74 @@ const Dashboard = () => {
                 </svg>
               </button>
             )}
-            <div className="h-10 w-10 rounded-full bg-gradient-to-tr from-blue-600 to-purple-600 flex items-center justify-center font-bold border-2 border-white/10 uppercase">
-                {user?.name ? user.name.charAt(0) : '?'}
+          </div>
+            <div className="flex items-center gap-4">
+              <div className="relative group">
+                <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center font-black text-xl border border-white/20 shadow-lg shadow-blue-500/10 group-hover:scale-105 transition-transform duration-300">
+                  {user?.name?.charAt(0) || '?'}
+                </div>
+                {/* Status Glow Dot */}
+                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-[#0a0a0a] rounded-full flex items-center justify-center">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                </div>
+              </div>
+              <div className="flex flex-col items-end">
+                
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-sm font-bold text-white uppercase tracking-tight italic">
+                      {user?.name || 'Unknown'}
+                    </h3>
+                    <AnimatePresence mode="wait">
+                      {user?.isVerified ? (
+                    /* Green Verified Tick */
+                        <motion.div 
+                          key="verified"
+                          initial={{ scale: 0 }} 
+                          animate={{ scale: 1 }}
+                          title="Verified Account"
+                          className="flex-shrink-0"
+                        >
+                          <svg 
+                            className="w-3.5 h-3.5 text-green-500 fill-current" 
+                            viewBox="0 0 24 24"
+                          >
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                          </svg>
+                        </motion.div>
+                      ) : (
+                    /* Red Warning/Exclamation Sign */
+                        <motion.button 
+                          key="unverified"
+                          exit={{ opacity: 0 }}
+                          onClick={handleRequestOTP}
+                          disabled={isSending}
+                          className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-red-500/10 border border-red-500/30 hover:bg-red-500/20 transition-all group"
+                        >
+                          <span className="text-[10px] font-black text-red-500 tracking-tighter uppercase">
+                            {isSending ? 'SENDING...' : 'VERIFY NOW'}
+                          </span>
+                          <svg 
+                            className="w-3.5 h-3.5 text-red-500" 
+                            fill="none" 
+                            stroke="currentColor" 
+                            viewBox="0 0 24 24"
+                          >
+                            <path 
+                              strokeLinecap="round" 
+                              strokeLinejoin="round" 
+                              strokeWidth={3} 
+                              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" 
+                            />
+                          </svg>
+                        </motion.button>
+                      )}
+                    </AnimatePresence>
+                  </div>  
+                  <p className="text-[10px] font-black text-green-500 tracking-[0.2em] uppercase mt-0.5 font-mono">
+                    {user?.role}
+                  </p>
+                </div>
             </div>
-            <div className="text-right hidden sm:block">
-                <p className="text-sm font-medium">{user?.name ? user?.name : 'unknown'}</p>
-                <p className="text-xs text-green-500 uppercase">{user?.role}</p>
-            </div>
-        </div>  
         </header>
 
         {/* Stats Section */}
@@ -238,6 +363,63 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
+        <AnimatePresence>
+          {showOtpModal && (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.8, y: 40 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.8, y: 40 }}
+                className="bg-[#0b0b0b] border border-blue-500/20 p-8 rounded-3xl shadow-[0_0_50px_-12px_rgba(59,130,246,0.3)] max-w-md w-full text-center relative overflow-hidden"
+              >
+                {/* Decorative background glow */}
+                <div className="absolute -top-24 -left-24 w-48 h-48 bg-blue-600/10 blur-[80px] rounded-full" />
+
+                <div className="w-16 h-16 bg-blue-600/10 text-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-6 rotate-3 border border-blue-500/20">
+                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </div>
+
+                <h2 className="text-2xl font-black text-white mb-2 tracking-tight">SECURITY CHECK</h2>
+                <p className="text-gray-400 text-sm mb-8 px-4">
+                  Enter the 6-digit code sent to <br/>
+                  <span className="text-blue-400 font-semibold">{user?.email}</span>
+                </p>
+
+                <div className="flex justify-center gap-2 mb-10">
+                  {otp.map((data, index) => (
+                    <input
+                      key={index}
+                      type="text"
+                      maxLength="1"
+                      ref={(el) => (inputRefs.current[index] = el)}
+                      value={data}
+                      onChange={(e) => handleChange(e.target, index)}
+                      onKeyDown={(e) => handleKeyDown(e, index)}
+                      onFocus={(e) => e.target.select()}
+                      className="w-11 h-14 bg-white/5 border border-white/10 rounded-xl text-center text-2xl font-bold text-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 outline-none transition-all duration-200"
+                    />
+                  ))}
+                </div>
+
+                <button 
+                  className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-2xl transition-all shadow-xl shadow-blue-900/20 active:scale-95 mb-4"
+                  onClick={() => handleVerifyOTP(otp.join(""))}
+                >
+                  VERIFY & UNLOCK
+                </button>
+
+                <button 
+                  onClick={() => setShowOtpModal(false)}
+                  className="text-gray-500 hover:text-red-400 text-[10px] uppercase font-black tracking-widest transition-colors"
+                >
+                  Cancel Verification
+                </button>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
       </main>
       <ComingSoonToast isVisible={isVisible} />
     </div>
