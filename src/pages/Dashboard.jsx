@@ -66,7 +66,7 @@ const Dashboard = () => {
     useEffect(() => {
         fetchServerLoad();
         // Refresh every 10 seconds to monitor performance
-        const pulseInterval = setInterval(() => {
+        const interval = setInterval(() => {
             setServerMetrics(prev => ({
                 ...prev,
                 // Slightly shift the existing number by +/- 1
