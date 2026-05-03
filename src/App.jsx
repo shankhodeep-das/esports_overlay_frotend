@@ -9,6 +9,8 @@ import Home from './pages/Home';
 import Signup from './pages/signup';
 import UpcomingFeature from './components/upcommingPage';
 import Dashboard from './pages/Dashboard';
+import ProtectedRoute from './components/ProtectedRoute';
+import MatchControl from './pages/MatchControl';
 
 
 
@@ -19,6 +21,8 @@ function App() {
 
         <Routes>
           <Route path="/" element={ <Home />}/>
+          
+          <Route path="/match-control" element={<ProtectedRoute allowedRoles={['ADMIN', 'DEVELOPER', 'MANAGER', 'EDITOR']}> <MatchControl /> </ProtectedRoute>} />
 
           <Route path="/dashboard" element={<Dashboard />} />
 

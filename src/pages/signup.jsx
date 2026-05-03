@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import API from '../api/axiosInstance';
+import { useAuth } from '../context/AuthContext';
 
 
 
 const Signup = () => {
   const [formData, setFormData] = useState({ username: '', email: '', password: '' });
   const navigate = useNavigate();
+  const { setToken, setUser } = useAuth();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -19,7 +21,11 @@ const Signup = () => {
       // Ensure your backend URL is correct (or use a proxy in package.json)
       const res = await API.post('/auth/signup', formData);
 
+      if (res.data.token) {
+        setToken(res.data.token); 
+        setUser(res.data.user);
 
+      }
       if (res.status === 200 || res.status === 201) {
         // 1. Update Context so the app knows we are logged in
 

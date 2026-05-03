@@ -192,7 +192,7 @@ const Dashboard = () => {
         
         <nav className="flex-1 space-y-2">
             <NavItem label="Overview" active />
-            <NavItem label="Match Control" onClick={trigger} />
+            <NavItem label="Match Control" onClick= {() => navigate("/match-control")} />
             <NavItem label="Live Overlays" onClick={trigger} />
             <NavItem label="Team Management" onClick={trigger} />
             <NavItem label="Settings" onClick={trigger} />

@@ -6,14 +6,22 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const checkAuth = async () => {
     try {
       const res = await API.get("/auth/me");
-      setUser(res.data.user);
+      if (res.data.success) {
+        setUser(res.data.user);
+        // If your backend returns the token in the body of /auth/me
+        if (res.data.token) {
+          setToken(res.data.token);
+        }
+      }
     } catch (error) {
       setUser(null);
+      setToken(null);
     } finally {
       setLoading(false);
     }
@@ -24,7 +32,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, setUser, loading, checkAuth }}>
+    <AuthContext.Provider value={{ user, setUser, token, setToken, loading, checkAuth }}>
       {children}
     </AuthContext.Provider>
   );
