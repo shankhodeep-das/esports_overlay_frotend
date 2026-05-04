@@ -22,6 +22,15 @@ const CreateMatchModal = ({ isOpen, onClose, refreshMatches }) => {
     setFormData({ ...formData, [e.target.name]: value });
   };
 
+  const handleOpenEditor = (sheetId) => {
+    if (sheetId) {
+      // Opens the Google Master Sheet in a new tab
+      window.open(sheetId, "_blank", "noopener,noreferrer");
+    } else {
+      alert("No Master Sheet linked to this match.");
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);

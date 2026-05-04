@@ -11,6 +11,7 @@ import UpcomingFeature from './components/upcommingPage';
 import Dashboard from './pages/Dashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import MatchControl from './pages/MatchControl';
+import LiveOverlay from './pages/LiveOverlayPage';
 
 
 
@@ -21,6 +22,7 @@ function App() {
 
         <Routes>
           <Route path="/" element={ <Home />}/>
+          <Route path="/overlay/:matchId" element={<LiveOverlay />} />
           
           <Route path="/match-control" element={<ProtectedRoute allowedRoles={['ADMIN', 'DEVELOPER', 'MANAGER', 'EDITOR']}> <MatchControl /> </ProtectedRoute>} />
 

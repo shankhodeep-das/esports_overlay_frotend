@@ -128,10 +128,18 @@ const MatchControl = () => {
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <button className="py-2.5 bg-white/5 hover:bg-white/10 text-white text-[10px] font-black rounded-xl border border-white/5 transition-all">
+                <button 
+                  onClick={() => {
+                    if (match.sheetId) {
+                      window.open(`https://docs.google.com/spreadsheets/d/${match.sheetId}`, "_blank", "noopener,noreferrer");
+                    } else {
+                      alert("No Sheet ID found for this match.");
+                    }
+                  }}
+                  className="py-2.5 bg-white/5 hover:bg-white/10 text-white text-[10px] font-black rounded-xl border border-white/5 transition-all">
                   OPEN EDITOR
                 </button>
-                <button className="py-2.5 bg-blue-600/10 hover:bg-blue-600 text-blue-500 hover:text-white text-[10px] font-black rounded-xl border border-blue-500/10 transition-all">
+                <button onClick={() => window.open(`/overlay/${match._id}`, '_blank')} className="py-2.5 bg-blue-600/10 hover:bg-blue-600 text-blue-500 hover:text-white text-[10px] font-black rounded-xl border border-blue-500/10 transition-all">
                   VIEW STATS
                 </button>
               </div>
