@@ -98,6 +98,19 @@ const LiveOverlay = () => {
                                             {index + 1}<sup>ST</sup>
                                         </div>
 
+                                        <div className="w-10 h-full flex items-center justify-center ml-2">
+                                            {team.teamLogo ? (
+                                                <img 
+                                                    src={team.teamLogo} 
+                                                    alt="" 
+                                                    className="h-7 w-7 object-contain drop-shadow-[0_0_3px_rgba(0,0,0,0.8)]"
+                                                    onError={(e) => { e.target.style.display = 'none'; }} 
+                                                />
+                                            ) : (
+                                                <div className="w-7 h-7 bg-white/5 rounded-full border border-white/10" />
+                                            )}
+                                        </div>
+
                                         <div className="flex-1 px-4 text-white font-bold italic truncate uppercase tracking-tight">
                                             {team.teamName || "TBD"}
                                         </div>

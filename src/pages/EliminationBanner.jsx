@@ -11,10 +11,10 @@ const EliminationBanner = ({ teams }) => {
         teams.forEach(team => {
             const lastKnownCount = prevAliveStatus.current[team.slotNumber];
             
-            // Trigger when a team goes from alive (>0) to dead (0)
+            // Detection logic for team elimination
             if (lastKnownCount > 0 && team.aliveCount === 0) {
                 setEliminatedTeam(team);
-                setTimeout(() => setEliminatedTeam(null), 3000); // Shorter duration
+                setTimeout(() => setEliminatedTeam(null), 3500); 
             }
         });
 
@@ -26,24 +26,47 @@ const EliminationBanner = ({ teams }) => {
     return (
         <AnimatePresence>
             {eliminatedTeam && (
-                <div className="fixed top-32 left-1/2 -translate-x-1/2 z-[9999] pointer-events-none">
+                <div className="fixed top-28 left-1/2 -translate-x-1/2 z-[9999] pointer-events-none">
                     <motion.div
-                        initial={{ y: -50, opacity: 0, scale: 0.8 }}
-                        animate={{ y: 0, opacity: 1, scale: 1 }}
-                        exit={{ y: -20, opacity: 0, scale: 0.8 }}
-                        className="bg-gradient-to-r from-red-900/90 via-red-600 to-red-900/90 
-                                   px-8 py-2 rounded-full border border-white/20 shadow-[0_0_20px_rgba(255,0,0,0.4)]
-                                   flex flex-col items-center min-w-[250px]"
+                        initial={{ opacity: 0, scale: 0.8, y: -20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.9, y: 10 }}
+                        className="relative flex items-center"
                     >
-                        <span className="text-white font-black italic text-xl uppercase tracking-tighter">
-                            {eliminatedTeam.teamName}
-                        </span>
-                        <div className="flex items-center gap-2 -mt-1">
-                            <div className="h-[1px] w-8 bg-white/40" />
-                            <span className="text-red-100 font-bold tracking-[0.2em] uppercase text-[10px]">
-                                Eliminated
-                            </span>
-                            <div className="h-[1px] w-8 bg-white/40" />
+                        {/* Compact Skewed Background */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-red-950/95 to-black/90 skew-x-[-12deg] border-l-2 border-r-2 border-red-600 shadow-lg" />
+
+                        <div className="relative flex items-center px-5 py-2 z-10">
+                            {/* Smaller Logo Section */}
+                            <div className="mr-4">
+                                {eliminatedTeam.teamLogo ? (
+                                    <img 
+                                        src={eliminatedTeam.teamLogo}
+                                        className="w-10 h-10 object-contain drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]"
+                                        alt=""
+                                    />
+                                ) : (
+                                    <div className="w-10 h-10 bg-white/10 rounded flex items-center justify-center text-white text-xs font-black italic">
+                                        {eliminatedTeam.slotNumber}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Compact Text Section */}
+                            <div className="flex flex-col">
+                                <span className="text-white font-black italic text-xl uppercase tracking-tight leading-none">
+                                    {eliminatedTeam.teamName}
+                                </span>
+                                <span className="text-red-500 font-bold tracking-[0.2em] uppercase text-[9px] mt-0.5">
+                                    Eliminated
+                                </span>
+                            </div>
+
+                            {/* Minimal Stats Section */}
+                            <div className="ml-6 border-l border-white/20 pl-4 flex flex-col justify-center">
+                                <span className="text-white font-black text-lg italic leading-none">{eliminatedTeam.kills || 0}</span>
+                                <span className="text-gray-400 text-[8px] font-bold uppercase tracking-widest">Kills</span>
+                            </div>
                         </div>
                     </motion.div>
                 </div>
